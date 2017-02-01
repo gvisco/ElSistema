@@ -99,6 +99,9 @@ function Population(size) {
 
     this.targets = [];
     this.performance = [];
+    this.fitnessHistory = [];
+
+    this.historyPlot = new Plot(0, 450, 600, 150);
 
     this.numP = createP("None");
     this.generationP = createP("None");
@@ -143,6 +146,13 @@ function Population(size) {
         fit = this.fitness();
         this.performance[this.currentIndex] = fit;
 
+        if (this.fitnessHistory.length > 50) {
+            this.fitnessHistory = this.fitnessHistory.slice(1);
+        }
+        if (this.currentIndex == 0) {
+            this.historyPlot.draw(this.fitnessHistory);
+        }
+
         this.generationP.html("Generation: " + this.generation);
         this.numP.html((this.currentIndex + 1) + " of " + this.population.length);
         this.fitnessP.html("Fitness: " + fit);
@@ -159,6 +169,8 @@ function Population(size) {
     this.nextGeneration = function() {
         var maxFit = max(this.performance);
         var minFit = min(this.performance);
+//        this.fitnessHistory.push([maxFit, minFit]);
+        this.fitnessHistory.push(maxFit);
         //print(maxFit + " " + minFit);
         normalizedPerformance = this.performance.map(function(x) {
             return (minFit == maxFit) ? 1 : (x - minFit) / (maxFit - minFit);
@@ -233,7 +245,7 @@ function Population(size) {
 
         //print(this.currentIndex + ": d:" + sumDistances + " s:" + treeSize + " l:" + treeLen);
         //return 1 / sumDistances;
-        return 1 / (sumDistances + treeSize + 0.1 * treeLen);
+        return 1 / (sumDistances + 0.1 * treeSize + 0.1 * treeLen);
     };
 }
 

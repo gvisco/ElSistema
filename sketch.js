@@ -9,7 +9,7 @@ function setup() {
 
     createCanvas(600, 600);
     
-    population = new Population(200);
+    population = new Population(100);
 
     //r1 = new Rule("X", "]++[-[++[-[]++[-[++[-[]221F--F--F--");
     //r2 = new Rule("Y", "");
