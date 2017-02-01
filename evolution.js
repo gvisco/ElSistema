@@ -141,6 +141,7 @@ function Population(size) {
 
         dna = this.DNAs[this.currentIndex];
         tree = this.population[this.currentIndex];
+        tree.update();
         tree.draw();
 
         fit = this.fitness();
