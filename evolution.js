@@ -103,7 +103,6 @@ function Population(size) {
 
     this.historyPlot = new Plot(0, 450, 600, 150);
 
-    this.numP = createP("None");
     this.generationP = createP("None");
     this.fitnessP = createP("None");
     this.r1P = createP("None");
@@ -134,54 +133,87 @@ function Population(size) {
     this.initPopulationFromDna();
 
 
-    this.next = function() {
-        if (this.currentIndex == this.population.length) {
-            this.nextGeneration();
-        } 
+    this.fitTree = function(tree) {
+        result = 0;
+        treeSize = tree.size();
+        if (treeSize > 0) {
+            sumDistances = this.targets.length == 0 ? 2 * (width + height) : 0;
+            for (var i = 0; i < this.targets.length; i++) {
+                t = this.targets[i];
+                minDistance = Number.MAX_SAFE_INTEGER;
+                closestPoint = createVector(0, 0);
+                for (var j = 0; j < tree.points.length; j++) {
+                    d = tree.points[j].dist(t);
+                    if (d < minDistance) {
+                        minDistance = d;
+                        closestPoint = tree.points[j];
+                    }
+                }
+                sumDistances += minDistance;
+            }
+            treeLen = tree.sentence.length;
 
-        dna = this.DNAs[this.currentIndex];
-        tree = this.population[this.currentIndex];
-        tree.update();
+            result = 1 / (sumDistances + 0.1 * treeSize + 0.1 * treeLen);
+        }
+        return result;
+    };
+
+
+    this.drawTreeInfo = function(tree, dna, fit) {
         tree.draw();
 
-        fit = this.fitness();
-        this.performance[this.currentIndex] = fit;
-
+        this.fitnessHistory.push(fit);
         if (this.fitnessHistory.length > 50) {
             this.fitnessHistory = this.fitnessHistory.slice(1);
         }
-        if (this.currentIndex == 0) {
-            this.historyPlot.draw(this.fitnessHistory);
-        }
+        this.historyPlot.draw(this.fitnessHistory);
 
         this.generationP.html("Generation: " + this.generation);
-        this.numP.html((this.currentIndex + 1) + " of " + this.population.length);
         this.fitnessP.html("Fitness: " + fit);
         this.r1P.html("1: " + dna.r1.to);
         this.r2P.html("2: " + dna.r2.to);
         this.iterationsP.html("Iterations: " + dna.iterations);
         this.sentenceP.html(tree.sentence);
+    };
 
-        this.currentIndex++;
-        
+
+    this.next = function() {
+        // update
+        topFitness = 0;
+        topFitnessIdx = 0;
+        for (var i = 0; i < this.population.length; i++) {
+            tree = this.population[i];
+            
+            tree.update();
+            
+            fit = this.fitTree(tree);
+            this.performance[i] = fit;
+
+            if (fit > topFitness) {
+                topFitness = fit;
+                topFitnessIdx = i;
+            }
+        }
+        // draw
+        bestTree = this.population[topFitnessIdx];
+        bestDna = this.DNAs[topFitnessIdx];
+        this.drawTreeInfo(tree, bestDna, topFitness);
+        // next generation
+        this.nextGeneration();
     };
 
 
     this.nextGeneration = function() {
         var maxFit = max(this.performance);
         var minFit = min(this.performance);
-//        this.fitnessHistory.push([maxFit, minFit]);
-        this.fitnessHistory.push(maxFit);
         //print(maxFit + " " + minFit);
         normalizedPerformance = this.performance.map(function(x) {
             return (minFit == maxFit) ? 1 : (x - minFit) / (maxFit - minFit);
         });
         newDNAs = [];
         for (var i = 0; i < this.size; i++) {
-            //print(normalizedPerformance);
-            dna1 = this.DNAs[this.selectByPerformance(normalizedPerformance)];
-            //dna2 = this.DNAs[this.selectByPerformance(normalizedPerformance)];
-            newDna = dna1.clone(); //.combine(dna2);
+            dna = this.DNAs[this.selectByPerformance(normalizedPerformance)];
+            newDna = dna.clone(); //.combine(dna2);
             newDna.mutate();
             newDNAs.push(newDna);
         }
@@ -212,41 +244,6 @@ function Population(size) {
 
     this.newTarget = function(t) {
         this.targets.push(t);
-    };
-
-    
-    this.fitness = function() {
-        tree = this.population[this.currentIndex];
-        
-        treeSize = tree.size();
-        if (treeSize == 0) {
-            return 0;
-        }
-
-        sumDistances = this.targets.length == 0 ? 2 * (width + height) : 0;
-        for (var i = 0; i < this.targets.length; i++) {
-            t = this.targets[i];
-            minDistance = Number.MAX_SAFE_INTEGER;
-            closestPoint = createVector(0, 0);
-            for (var j = 0; j < tree.points.length; j++) {
-                d = tree.points[j].dist(t);
-                if (d < minDistance) {
-                    minDistance = d;
-                    closestPoint = tree.points[j];
-                }
-            }
-            sumDistances += minDistance;
-
-            stroke(255, 100, 100);
-            strokeWeight(1);
-            line(closestPoint.x, closestPoint.y, t.x, t.y);
-        }
-
-        treeLen = tree.sentence.length;
-
-        //print(this.currentIndex + ": d:" + sumDistances + " s:" + treeSize + " l:" + treeLen);
-        //return 1 / sumDistances;
-        return 1 / (sumDistances + 0.1 * treeSize + 0.1 * treeLen);
     };
 }
 
