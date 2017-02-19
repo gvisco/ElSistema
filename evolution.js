@@ -1,7 +1,7 @@
 var maxlen = 30;
 var maxit = 5;
-var maxstep = 20;
-var mutationRate = 0.005;
+var maxstep = 100;
+var mutationRate = 0.01;
 
 function DNA(r1, r2, iterations, step) {
     this.alphabet = ["F","+","-","[","]","1","2"];
@@ -30,61 +30,54 @@ function DNA(r1, r2, iterations, step) {
         // increase/decrease iterations
         if (random() < mutationRate) {
             if (random() > 0.5 && this.iterations < maxit) {
-                print("increase iterations");
+                // print("increase iterations");
                 this.iterations++;
             } else if (this.iterations > 1) {
-                print("decrease iterations");
+                // print("decrease iterations");
                 this.maxit--;
             }
         }
 
-        // new step size
         if (random() < mutationRate) {
-            print("change step");
+            // print("change step");
             this.step = floor(random(maxstep - 1)) + 1;         
         }
 
-        // add new char in r1
         if (random() < mutationRate) {
-            print("new char in r1");
+            // print("new char in r1");
             c = random(this.alphabet);
             i = floor(random(this.r1.to.length));
             this.r1.to = this.r1.to.substr(0, i) + c + this.r1.to.substr(i, this.r1.to.length);           
         }
 
-        // add new char in r2
         if (random() < mutationRate) {
-            print("new char in r2");
+            // print("new char in r2");
             c = random(this.alphabet);
             i = floor(random(this.r2.to.length));
             this.r2.to = this.r2.to.substr(0, i) + c + this.r2.to.substr(i, this.r2.to.length);           
         }
 
-        // remove char from r1
         if (random() < mutationRate) {
-            print("remove char r1");
+            // print("remove char r1");
             i = floor(random(this.r1.to.length));
             this.r1.to = this.r1.to.substr(0, i) + this.r1.to.substr(i + 1, this.r1.to.length);           
         }
 
-        // remove char from r2
         if (random() < mutationRate) {
-            print("remove char r2");
+            // print("remove char r2");
             i = floor(random(this.r2.to.length));
             this.r2.to = this.r2.to.substr(0, i) + this.r2.to.substr(i + 1, this.r2.to.length);           
         }
 
-        // replace a char in r1  
         if (random() < mutationRate) {
-            print("replace char r1");
+            // print("replace char r1");
             i = floor(random(this.r1.to.length));
             c = random(this.alphabet);
             this.r1.to = this.r1.to.substr(0, i) + c + this.r1.to.substr(i + 1, this.r1.to.length);
         } 
 
-        // replace a char in r2  
         if (random() < mutationRate) {
-            print("replace char r2");
+            // print("replace char r2");
             i = floor(random(this.r2.to.length));
             c = random(this.alphabet);
             this.r2.to = this.r2.to.substr(0, i) + c + this.r2.to.substr(i + 1, this.r2.to.length);
@@ -101,7 +94,7 @@ function Population(size) {
     this.performance = [];
     this.fitnessHistory = [];
 
-    this.historyPlot = new Plot(0, 450, 600, 150);
+    this.historyPlot = new Plot();
 
     this.generationP = createP("None");
     this.fitnessP = createP("None");
@@ -194,10 +187,11 @@ function Population(size) {
                 topFitnessIdx = i;
             }
         }
+        //print(topFitness);
         // draw
         bestTree = this.population[topFitnessIdx];
         bestDna = this.DNAs[topFitnessIdx];
-        this.drawTreeInfo(tree, bestDna, topFitness);
+        this.drawTreeInfo(bestTree, bestDna, topFitness);
         // next generation
         this.nextGeneration();
     };

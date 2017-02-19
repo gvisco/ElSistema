@@ -42,8 +42,8 @@ function Tree(lsystem, iterations, step) {
     }
 
     this.draw = function() {
-        stroke(255, 200);
-        strokeWeight(2);
+        stroke(251, 184, 41);
+        strokeWeight(3);
 
         for (var i = 0; i < this.lines.length; i++) {
             p1 = this.lines[i][0];

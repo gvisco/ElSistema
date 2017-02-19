@@ -3,7 +3,7 @@ var population;
 
 function setup() {
     //noLoop();
-    frameRate(50);
+    frameRate(20);
 
     createCanvas(600, 600);
     
@@ -11,18 +11,19 @@ function setup() {
 }
 
 function draw() {
-    background(51, 51, 51);
+    background(85, 98, 112);
     if (targets.length == 0) {
         return;
     }
 
     population.next();
 
-    stroke(255);
-    strokeWeight(2);
+    fill(22, 147, 165);
+    noStroke();
+    // strokeWeight(2);
     for (var i = 0; i < targets.length; i++) {
         p = targets[i];
-        ellipse(p.x, p.y, 5);
+        ellipse(p.x, p.y, 10);
     }
 }
 
