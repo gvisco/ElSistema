@@ -1,4 +1,4 @@
-function Tree(lsystem, iterations, step) {
+function Tree(lsystem, iterations, step, angleDeg) {
     this.iterations = iterations;
     for (var i = 0; i < this.iterations; i++) {
         lsystem.next();
@@ -6,7 +6,7 @@ function Tree(lsystem, iterations, step) {
     this.sentence = lsystem.sentence;
 
     this.step = step;
-    this.angle = radians(25);
+    this.angle = radians(angleDeg);
     
     this.points = [];
     this.lines = [];
