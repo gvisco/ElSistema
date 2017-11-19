@@ -1,5 +1,6 @@
-var maxlen = 30;
+var maxlen = 10;
 var maxit = 5;
+var maxangle = 60;
 var maxstep = 100;
 var mutationRate = 0.01;
 
@@ -17,7 +18,7 @@ function DNA(r1, r2, iterations, step, angle) {
     this.r2 = r2 ? r2 : new Rule("2", randomSentence(this.alphabet, floor(random(maxlen))));    
     this.iterations = iterations ? iterations : floor(random(maxit)) + 1;
     this.step = step ? step : floor(random(maxstep)) + 1;
-    this.angle = angle ? angle : floor(random(45)) + 1;
+    this.angle = angle ? angle : floor(random(maxangle)) + 1;
 
 
     this.combine = function(dna) {
@@ -68,13 +69,17 @@ function DNA(r1, r2, iterations, step, angle) {
 
         this.iterations = wannaMutate() ? intMutation(0, maxit) + 1 : this.iterations;
         this.step = wannaMutate() ? intMutation(0, maxstep) + 1 : this.step;
-        this.angle = wannaMutate() ? intMutation(45) + 1 : this.angle;
+        this.angle = wannaMutate() ? intMutation(maxangle) + 1 : this.angle;
         this.r1.to = wannaMutate() ? insertCharFromAlphabethMutation(this.r1.to, this.alphabet) : this.r1.to;
         this.r2.to = wannaMutate() ? insertCharFromAlphabethMutation(this.r2.to, this.alphabet) : this.r2.to;
         this.r1.to = wannaMutate() ? removeCharMutation(this.r1.to) : this.r1.to;
         this.r2.to = wannaMutate() ? removeCharMutation(this.r2.to) : this.r2.to;
         this.r1.to = wannaMutate() ? replaceCharFromAlphabethMutation(this.r1.to, this.alphabet) : this.r1.to;
         this.r2.to = wannaMutate() ? replaceCharFromAlphabethMutation(this.r2.to, this.alphabet) : this.r2.to;
+
+        if (wannaMutate()) {
+            this.mutate();
+        }
     };
 }
 
@@ -97,13 +102,6 @@ function Population() {
     this.generation = 1;
     this.currentIndex = 0;
 
-
-    // // init random population
-    // for (var i = 0; i < this.size; i++) {
-    //     var dna = new DNA();
-    //     this.DNAs.push(dna);
-    // }
-
     this.newPopulationFromDna = function() {
         this.population = []
         for (var i = 0; i < this.DNAs.length; i ++) {
@@ -114,6 +112,7 @@ function Population() {
         }
     };
 
+
     this.initRandomPopulation = function(populationSize) {
         for (var i = 0; i < populationSize; i++) {
             var dna = new DNA();
@@ -122,8 +121,6 @@ function Population() {
         this.size = populationSize;
         this.newPopulationFromDna();
     };
-
-    // this.newPopulationFromDna();
 
 
     this.fitTree = function(tree) {
