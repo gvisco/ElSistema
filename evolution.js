@@ -49,36 +49,36 @@ function DNA(r1, r2, iterations, step, angle) {
         }   
 
         if (random() < mutationRate) {
-            c = random(this.alphabet);
-            i = floor(random(this.r1.to.length));
+            var c = random(this.alphabet);
+            var i = floor(random(this.r1.to.length));
             this.r1.to = this.r1.to.substr(0, i) + c + this.r1.to.substr(i, this.r1.to.length);           
         }
 
         if (random() < mutationRate) {
-            c = random(this.alphabet);
-            i = floor(random(this.r2.to.length));
+            var c = random(this.alphabet);
+            var i = floor(random(this.r2.to.length));
             this.r2.to = this.r2.to.substr(0, i) + c + this.r2.to.substr(i, this.r2.to.length);           
         }
 
         if (random() < mutationRate) {
-            i = floor(random(this.r1.to.length));
+            var i = floor(random(this.r1.to.length));
             this.r1.to = this.r1.to.substr(0, i) + this.r1.to.substr(i + 1, this.r1.to.length);           
         }
 
         if (random() < mutationRate) {
-            i = floor(random(this.r2.to.length));
+            var i = floor(random(this.r2.to.length));
             this.r2.to = this.r2.to.substr(0, i) + this.r2.to.substr(i + 1, this.r2.to.length);           
         }
 
         if (random() < mutationRate) {
-            i = floor(random(this.r1.to.length));
-            c = random(this.alphabet);
+            var i = floor(random(this.r1.to.length));
+            var c = random(this.alphabet);
             this.r1.to = this.r1.to.substr(0, i) + c + this.r1.to.substr(i + 1, this.r1.to.length);
         } 
 
         if (random() < mutationRate) {
-            i = floor(random(this.r2.to.length));
-            c = random(this.alphabet);
+            var i = floor(random(this.r2.to.length));
+            var c = random(this.alphabet);
             this.r2.to = this.r2.to.substr(0, i) + c + this.r2.to.substr(i + 1, this.r2.to.length);
         }         
     };
@@ -89,18 +89,12 @@ function Population(size) {
     this.population = [];
     this.DNAs = [];
 
+    this.bestTree;
+    this.bestDna;
+
     this.targets = [];
     this.performance = [];
     this.fitnessHistory = [];
-
-    this.historyPlot = new Plot();
-
-    this.generationP = createP("None");
-    this.fitnessP = createP("None");
-    this.r1P = createP("None");
-    this.r2P = createP("None");
-    this.iterationsP = createP("None");
-    this.sentenceP = createP("None");
 
     this.generation = 1;
     this.currentIndex = 0;
@@ -108,7 +102,7 @@ function Population(size) {
 
     // init random population
     for (var i = 0; i < this.size; i++) {
-        dna = new DNA();
+        var dna = new DNA();
         this.DNAs.push(dna);
     }
 
@@ -116,9 +110,9 @@ function Population(size) {
     this.initPopulationFromDna = function() {
         this.population = []
         for (var i = 0; i < this.DNAs.length; i ++) {
-            dna = this.DNAs[i];
-            lsystem = new LSystem("1", [dna.r1, dna.r2]);
-            tree = new Tree(lsystem, dna.iterations, dna.step, dna.angle);
+            var dna = this.DNAs[i];
+            var lsystem = new LSystem("1", [dna.r1, dna.r2]);
+            var tree = new Tree(lsystem, dna.iterations, dna.step, dna.angle);
             this.population.push(tree);
         }
     };
@@ -126,14 +120,14 @@ function Population(size) {
 
 
     this.fitTree = function(tree) {
-        result = 0;
-        treeSize = tree.size();
+        var result = 0;
+        var treeSize = tree.size();
         if (treeSize > 0) {
-            sumDistances = this.targets.length == 0 ? 2 * (width + height) : 0;
+            var sumDistances = this.targets.length == 0 ? 2 * (width + height) : 0;
             for (var i = 0; i < this.targets.length; i++) {
-                t = this.targets[i];
-                minDistance = Number.MAX_SAFE_INTEGER;
-                closestPoint = createVector(0, 0);
+                var t = this.targets[i];
+                var minDistance = Number.MAX_SAFE_INTEGER;
+                var closestPoint = createVector(0, 0);
                 for (var j = 0; j < tree.points.length; j++) {
                     d = tree.points[j].dist(t);
                     if (d < minDistance) {
@@ -143,7 +137,7 @@ function Population(size) {
                 }
                 sumDistances += minDistance;
             }
-            treeLen = tree.sentence.length;
+            var treeLen = tree.sentence.length;
 
             result = 1 / (sumDistances + 0.1 * treeSize + 0.1 * treeLen);
         }
@@ -151,34 +145,16 @@ function Population(size) {
     };
 
 
-    this.drawTreeInfo = function(tree, dna, fit) {
-        tree.draw();
-
-        this.fitnessHistory.push(fit);
-        if (this.fitnessHistory.length > 50) {
-            this.fitnessHistory = this.fitnessHistory.slice(1);
-        }
-        this.historyPlot.draw(this.fitnessHistory);
-
-        this.generationP.html("Generation: " + this.generation);
-        this.fitnessP.html("Fitness: " + fit);
-        this.r1P.html("1: " + dna.r1.to);
-        this.r2P.html("2: " + dna.r2.to);
-        this.iterationsP.html("Iterations: " + dna.iterations);
-        this.sentenceP.html(tree.sentence);
-    };
-
-
     this.next = function() {
         // update
-        topFitness = 0;
-        topFitnessIdx = 0;
+        var topFitness = 0;
+        var topFitnessIdx = 0;
         for (var i = 0; i < this.population.length; i++) {
-            tree = this.population[i];
+            var tree = this.population[i];
             
             tree.update();
             
-            fit = this.fitTree(tree);
+            var fit = this.fitTree(tree);
             this.performance[i] = fit;
 
             if (fit > topFitness) {
@@ -186,13 +162,11 @@ function Population(size) {
                 topFitnessIdx = i;
             }
         }
-        //print(topFitness);
-        // draw
-        bestTree = this.population[topFitnessIdx];
-        bestDna = this.DNAs[topFitnessIdx];
-        this.drawTreeInfo(bestTree, bestDna, topFitness);
-        // next generation
-        this.nextGeneration();
+
+        this.fitnessHistory.push(topFitness);
+
+        this.bestTree = this.population[topFitnessIdx];
+        this.bestDna = this.DNAs[topFitnessIdx];
     };
 
 
@@ -200,20 +174,20 @@ function Population(size) {
         var maxFit = max(this.performance);
         var minFit = min(this.performance);
         //print(maxFit + " " + minFit);
-        normalizedPerformance = this.performance.map(function(x) {
+        var normalizedPerformance = this.performance.map(function(x) {
             return (minFit == maxFit) ? 1 : (x - minFit) / (maxFit - minFit);
         });
 
-        newDNAs = [];
-        geneticSelection = floor(this.size * 0.50);
+        var newDNAs = [];
+        var geneticSelection = floor(this.size * 0.50);
         for (var i = 0; i < geneticSelection; i++) {
-            dna = this.DNAs[this.selectByPerformance(normalizedPerformance)];
-            newDna = dna.clone(); //.combine(dna2);
+            var dna = this.DNAs[this.selectByPerformance(normalizedPerformance)];
+            var newDna = dna.clone(); //.combine(dna2);
             newDna.mutate();
             newDNAs.push(newDna);
         }
         for (var i = 0; i < this.size - geneticSelection; i++) {
-            randomDna = new DNA();
+            var randomDna = new DNA();
             newDNAs.push(randomDna);
         }
 
@@ -226,16 +200,16 @@ function Population(size) {
 
 
     this.selectByPerformance = function(performances) {
-        counter = 0;
+        var counter = 0;
         while (true) {
-            idx = floor(random(performances.length));
+            var idx = floor(random(performances.length));
             if (performances[idx] >= random()){
                 return idx;
             }
 
             counter++;
             if (counter > 1000000) {
-                print("BUM!");
+                print("BOOOM!");
                 return;
             }
         }
@@ -248,7 +222,7 @@ function Population(size) {
 }
 
 function randomSentence(alphabet, len) {
-    result = '';
+    var result = '';
     for (var i = 0; i < len; i ++) {
         result += random(alphabet);        
     }

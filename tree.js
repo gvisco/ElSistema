@@ -41,17 +41,6 @@ function Tree(lsystem, iterations, step, angleDeg) {
         }
     }
 
-    this.draw = function() {
-        stroke(251, 184, 41);
-        strokeWeight(3);
-
-        for (var i = 0; i < this.lines.length; i++) {
-            p1 = this.lines[i][0];
-            p2 = this.lines[i][1];
-            line(p1.x, p1.y, p2.x, p2.y);
-        }
-    };
-
     this.size = function() {
         //return (this.sentence.match(new RegExp("F", "g")) || []).length;
         return this.points.length;

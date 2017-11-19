@@ -5,26 +5,26 @@ function setup() {
     //noLoop();
     frameRate(20);
 
-    createCanvas(600, 600);
+    initRendering();
     
     population = new Population(100);
 }
 
 function draw() {
-    background(85, 98, 112);
+    drawBackground();
+
     if (targets.length == 0) {
         return;
     }
 
     population.next();
 
-    fill(22, 147, 165);
-    noStroke();
-    // strokeWeight(2);
-    for (var i = 0; i < targets.length; i++) {
-        p = targets[i];
-        ellipse(p.x, p.y, 10);
-    }
+    drawTree(population.bestTree);
+    drawTargetPoints(targets);
+    drawPopulationInfo(population);
+
+    population.nextGeneration();
+
 }
 
 function mouseClicked() {
