@@ -15,7 +15,8 @@ function Tree(lsystem, iterations, step, angleDeg) {
         this.points = [];
         this.lines = [];
         var currentStack = []
-        var currentPosition = createVector(width / 2, height / 2);
+        //var currentPosition = createVector(width / 2, height / 2);
+        var currentPosition = createVector(0.0, 0.0);
         var currentOrientation = createVector(0, -1);
         for (var j = 0; j < this.sentence.length; j++) {
             var currentChar = this.sentence.charAt(j);

@@ -78,15 +78,19 @@ function DNA(r1, r2, iterations, step, angle) {
     };
 }
 
-function Population(size) {
-    this.size = size;
+function Population() {
+    this.size = 0;
     this.population = [];
     this.DNAs = [];
 
     this.bestTree;
     this.bestDna;
 
-    this.targets = [];
+    this.fitTreeDistance = 0.8;
+    this.fitTreeSize = 0.1;
+    this.fitTreeSentenceLen = 0.1;
+
+    this.targetPoints = [];
     this.performance = [];
     this.fitnessHistory = [];
 
@@ -94,14 +98,13 @@ function Population(size) {
     this.currentIndex = 0;
 
 
-    // init random population
-    for (var i = 0; i < this.size; i++) {
-        var dna = new DNA();
-        this.DNAs.push(dna);
-    }
+    // // init random population
+    // for (var i = 0; i < this.size; i++) {
+    //     var dna = new DNA();
+    //     this.DNAs.push(dna);
+    // }
 
-    
-    this.initPopulationFromDna = function() {
+    this.newPopulationFromDna = function() {
         this.population = []
         for (var i = 0; i < this.DNAs.length; i ++) {
             var dna = this.DNAs[i];
@@ -110,16 +113,26 @@ function Population(size) {
             this.population.push(tree);
         }
     };
-    this.initPopulationFromDna();
+
+    this.initRandomPopulation = function(populationSize) {
+        for (var i = 0; i < populationSize; i++) {
+            var dna = new DNA();
+            this.DNAs.push(dna);
+        }
+        this.size = populationSize;
+        this.newPopulationFromDna();
+    };
+
+    // this.newPopulationFromDna();
 
 
     this.fitTree = function(tree) {
         var result = 0;
         var treeSize = tree.size();
         if (treeSize > 0) {
-            var sumDistances = this.targets.length == 0 ? 2 * (width + height) : 0;
-            for (var i = 0; i < this.targets.length; i++) {
-                var t = this.targets[i];
+            var sumDistances = this.targetPoints.length == 0 ? 2 * (width + height) : 0;
+            for (var i = 0; i < this.targetPoints.length; i++) {
+                var t = this.targetPoints[i];
                 var minDistance = Number.MAX_SAFE_INTEGER;
                 var closestPoint = createVector(0, 0);
                 for (var j = 0; j < tree.points.length; j++) {
@@ -133,14 +146,13 @@ function Population(size) {
             }
             var treeLen = tree.sentence.length;
 
-            result = 1 / (sumDistances + 0.1 * treeSize + 0.1 * treeLen);
+            result = 1 / (sumDistances * this.fitTreeDistance + treeSize * this.fitTreeSize + treeLen * this.fitTreeSentenceLen);
         }
         return result;
     };
 
 
-    this.next = function() {
-        // update
+    this.selectWinners = function() {
         var topFitness = 0;
         var topFitnessIdx = 0;
         for (var i = 0; i < this.population.length; i++) {
@@ -186,7 +198,7 @@ function Population(size) {
         }
 
         this.DNAs = newDNAs;
-        this.initPopulationFromDna();
+        this.newPopulationFromDna();
 
         this.generation++;
         this.currentIndex = 0;
@@ -211,7 +223,7 @@ function Population(size) {
 
 
     this.newTarget = function(t) {
-        this.targets.push(t);
+        this.targetPoints.push(t);
     };
 }
 

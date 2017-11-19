@@ -1,5 +1,9 @@
+
+var viewOffset;
+
 function initRendering() {
     createCanvas(600, 600);
+    viewOffset = createVector(width / 2.0 , height * 3 / 4.0);
 
     historyPlot = new Plot();
 
@@ -12,17 +16,30 @@ function initRendering() {
 }
 
 function drawTree(tree) {
+    push();
     stroke(251, 184, 41);
     strokeWeight(3);
 
     for (var i = 0; i < tree.lines.length; i++) {
-        var p1 = tree.lines[i][0];
-        var p2 = tree.lines[i][1];
+        var p1 = p5.Vector.add(tree.lines[i][0], viewOffset);
+        var p2 = p5.Vector.add(tree.lines[i][1], viewOffset);
         line(p1.x, p1.y, p2.x, p2.y);
     }
+    ellipse(viewOffset.x, viewOffset.y, 10);
+    pop();
 }
 
+function drawTreeRoot() {
+    push();
+    stroke(251, 184, 41);
+    strokeWeight(3);
+    ellipse(viewOffset.x, viewOffset.y, 10);
+    pop();
+}
+
+
 function drawPopulationInfo(population) {   
+    push();
     var history = population.fitnessHistory; 
     if (history.length > 150) {
         history = history.slice(history.length - 150);
@@ -39,16 +56,19 @@ function drawPopulationInfo(population) {
     iterationsP.html("Iterations: " + dna.iterations);
     
     sentenceP.html(population.bestTree.sentence);
+    pop();
 }
 
 function drawTargetPoints(targets) {
+    push();
     fill(22, 147, 165);
     noStroke();
     // strokeWeight(2);
     for (var i = 0; i < targets.length; i++) {
-        var p = targets[i];
+        var p = p5.Vector.add(targets[i], viewOffset);
         ellipse(p.x, p.y, 10);
     }
+    pop();
 }
 
 function drawBackground() {
