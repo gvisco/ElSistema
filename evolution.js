@@ -4,21 +4,32 @@ var maxstep = 100;
 var mutationRate = 0.01;
 
 function DNA(r1, r2, iterations, step, angle) {
-    this.alphabet = ["F","+","-","[","]","1","2"];
+    var randomSentence = function(alphabet, len) {
+        var result = '';
+        for (var i = 0; i < len; i ++) {
+            result += random(alphabet);        
+        }
+        return result;
+    };
 
+    this.alphabet = ["F","+","-","[","]","1","2"];
     this.r1 = r1 ? r1 : new Rule("1", randomSentence(this.alphabet, floor(random(maxlen))));    
     this.r2 = r2 ? r2 : new Rule("2", randomSentence(this.alphabet, floor(random(maxlen))));    
-    this.iterations = iterations ? iterations : floor(random(maxit - 1)) + 1;
-    this.step = step ? step : floor(random(maxstep - 1)) + 1;
+    this.iterations = iterations ? iterations : floor(random(maxit)) + 1;
+    this.step = step ? step : floor(random(maxstep)) + 1;
     this.angle = angle ? angle : floor(random(45)) + 1;
 
 
     this.combine = function(dna) {
-        newIterations = (random() > 0.5) ? this.iterations : dna.iterations;
-        newStep = random() > 0.5 ? this.step : dna.step;
-        newR1 = random() > 0.5 ? this.r1 : dna.r1;
-        newR2 = random() > 0.5 ? this.r2 : dna.r2;
-        newAngle = random() > 0.5 ? this.angle : dna.angle;
+        var flipCoin = function() {
+            return random() > 0.5;
+        }
+
+        newIterations = flipCoin() ? this.iterations : dna.iterations;
+        newStep = flipCoin() ? this.step : dna.step;
+        newR1 = flipCoin() ? this.r1 : dna.r1;
+        newR2 = flipCoin() ? this.r2 : dna.r2;
+        newAngle = flipCoin() ? this.angle : dna.angle;
 
         return new DNA(newR1, newR2, newIterations, newStep);
     };
@@ -29,58 +40,41 @@ function DNA(r1, r2, iterations, step, angle) {
     };
 
     this.mutate = function() {
-        // increase/decrease iterations
-        if (random() < mutationRate) {
-            if (random() > 0.5 && this.iterations < maxit) {
-                // print("increase iterations");
-                this.iterations++;
-            } else if (this.iterations > 1) {
-                // print("decrease iterations");
-                this.maxit--;
-            }
-        }
 
-        if (random() < mutationRate) {
-            this.step = floor(random(maxstep - 1)) + 1;         
-        }
+        var wannaMutate = function() {
+            return random() < mutationRate
+        };
 
-        if (random() < mutationRate) {
-            this.angle = floor(random(45)) + 1;
-        }   
+        var intMutation = function(minInt, maxInt) {
+            return floor(random(minInt, maxInt));
+        };
 
-        if (random() < mutationRate) {
-            var c = random(this.alphabet);
-            var i = floor(random(this.r1.to.length));
-            this.r1.to = this.r1.to.substr(0, i) + c + this.r1.to.substr(i, this.r1.to.length);           
-        }
+        var insertCharFromAlphabethMutation = function(str, alphabet) {
+            var c = random(alphabet);
+            var i = floor(random(str.length));
+            return str.substr(0, i) + c + str.substr(i, str.length);
+        };
 
-        if (random() < mutationRate) {
-            var c = random(this.alphabet);
-            var i = floor(random(this.r2.to.length));
-            this.r2.to = this.r2.to.substr(0, i) + c + this.r2.to.substr(i, this.r2.to.length);           
-        }
+        var removeCharMutation = function(str) {
+            var i = floor(random(str.length));
+            return str.substr(0, i) + str.substr(i + 1, str.length);
+        };
 
-        if (random() < mutationRate) {
-            var i = floor(random(this.r1.to.length));
-            this.r1.to = this.r1.to.substr(0, i) + this.r1.to.substr(i + 1, this.r1.to.length);           
-        }
+        var replaceCharFromAlphabethMutation = function(str, alphabet) {
+            var c = random(alphabet);
+            var i = floor(random(str.length));
+            return str.substr(0, i) + c + str.substr(i + 1, str.length);
+        };
 
-        if (random() < mutationRate) {
-            var i = floor(random(this.r2.to.length));
-            this.r2.to = this.r2.to.substr(0, i) + this.r2.to.substr(i + 1, this.r2.to.length);           
-        }
-
-        if (random() < mutationRate) {
-            var i = floor(random(this.r1.to.length));
-            var c = random(this.alphabet);
-            this.r1.to = this.r1.to.substr(0, i) + c + this.r1.to.substr(i + 1, this.r1.to.length);
-        } 
-
-        if (random() < mutationRate) {
-            var i = floor(random(this.r2.to.length));
-            var c = random(this.alphabet);
-            this.r2.to = this.r2.to.substr(0, i) + c + this.r2.to.substr(i + 1, this.r2.to.length);
-        }         
+        this.iterations = wannaMutate() ? intMutation(0, maxit) + 1 : this.iterations;
+        this.step = wannaMutate() ? intMutation(0, maxstep) + 1 : this.step;
+        this.angle = wannaMutate() ? intMutation(45) + 1 : this.angle;
+        this.r1.to = wannaMutate() ? insertCharFromAlphabethMutation(this.r1.to, this.alphabet) : this.r1.to;
+        this.r2.to = wannaMutate() ? insertCharFromAlphabethMutation(this.r2.to, this.alphabet) : this.r2.to;
+        this.r1.to = wannaMutate() ? removeCharMutation(this.r1.to) : this.r1.to;
+        this.r2.to = wannaMutate() ? removeCharMutation(this.r2.to) : this.r2.to;
+        this.r1.to = wannaMutate() ? replaceCharFromAlphabethMutation(this.r1.to, this.alphabet) : this.r1.to;
+        this.r2.to = wannaMutate() ? replaceCharFromAlphabethMutation(this.r2.to, this.alphabet) : this.r2.to;
     };
 }
 
@@ -206,7 +200,7 @@ function Population(size) {
             if (performances[idx] >= random()){
                 return idx;
             }
-
+            // avoid looping forever
             counter++;
             if (counter > 1000000) {
                 print("BOOOM!");
@@ -221,10 +215,3 @@ function Population(size) {
     };
 }
 
-function randomSentence(alphabet, len) {
-    var result = '';
-    for (var i = 0; i < len; i ++) {
-        result += random(alphabet);        
-    }
-    return result;
-}

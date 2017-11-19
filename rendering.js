@@ -16,16 +16,16 @@ function drawTree(tree) {
     strokeWeight(3);
 
     for (var i = 0; i < tree.lines.length; i++) {
-        p1 = tree.lines[i][0];
-        p2 = tree.lines[i][1];
+        var p1 = tree.lines[i][0];
+        var p2 = tree.lines[i][1];
         line(p1.x, p1.y, p2.x, p2.y);
     }
 }
 
 function drawPopulationInfo(population) {   
     var history = population.fitnessHistory; 
-    if (history.length > 50) {
-        history = history.slice(1);
+    if (history.length > 150) {
+        history = history.slice(history.length - 150);
     }
 
     historyPlot.draw(history);
@@ -46,7 +46,7 @@ function drawTargetPoints(targets) {
     noStroke();
     // strokeWeight(2);
     for (var i = 0; i < targets.length; i++) {
-        p = targets[i];
+        var p = targets[i];
         ellipse(p.x, p.y, 10);
     }
 }
